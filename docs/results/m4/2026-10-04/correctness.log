@@ -1,0 +1,488 @@
+Validation code revision e8bd91ce38a4cf93b577eb36ccd67dd3f8806495
+
+$ cargo fmt --all -- --check
+exit=0
+
+$ cargo clippy --locked --all-targets -- -D warnings
+    Checking epochsnap v0.1.0 (.)
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.18s
+exit=0
+
+$ cargo test --lib
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.07s
+     Running unittests src/lib.rs (target/debug/deps/epochsnap-9da7c3eb62b5d462)
+
+running 12 tests
+test arena::tests::arena_identity_never_wraps_or_reuses_an_id ... ok
+test arena::tests::image_capacity_failure_is_reported_without_panicking ... ok
+test linux::tests::missing_features_and_ioctl_support_are_errors ... ok
+test arena::tests::generation_exhaustion_does_not_publish_an_image_or_wrap ... ok
+test linux::tests::packed_fault_decodes_and_rejects_unexpected_flags ... ok
+test linux::tests::retries_interrupted_calls_and_only_requested_eagain ... ok
+test linux::tests::syscall_error_preserves_operation_and_errno ... ok
+test linux::tests::terminal_failure_is_visible_before_release ... ok
+test linux::tests::linux_66_uapi_layout_and_requests ... ok
+test mapping::tests::initialized_rounded_mapping_and_atomic_page_copy ... ok
+test arena::tests::restore_preserves_mapping_and_reuses_prepared_storage ... ok
+test mapping::tests::rejects_invalid_allocation_sizes ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+exit=0
+
+$ cargo test --doc
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.01s
+   Doc-tests epochsnap
+
+running 1 test
+test src/arena.rs - arena::Arena (line 80) ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 5 tests
+test src/arena.rs - arena::Arena::checkpoint_words (line 306) - compile fail ... ok
+test src/arena.rs - arena::Arena::checkpoint_words (line 297) - compile fail ... ok
+test src/arena.rs - arena::Epoch (line 36) - compile fail ... ok
+test src/arena.rs - arena::Arena (line 98) - compile fail ... ok
+test src/arena.rs - arena::Arena (line 106) - compile fail ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.04s
+
+all doctests ran in 0.22s; merged doctests compilation took 0.17s
+exit=0
+
+$ cargo test --test baseline
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.01s
+     Running tests/baseline.rs (target/debug/deps/baseline-0c3f1002a7aa6bb1)
+
+running 13 tests
+test rejects_zero_overflow_and_sizes_above_pointer_limit ... ok
+test dropped_arena_token_is_invalid_for_a_new_arena ... ok
+test last_slot_is_writable_and_invalid_offsets_do_not_mutate ... ok
+test second_capture_is_busy_and_preserves_the_retained_image ... ok
+test ownership_and_retained_epoch_can_move_between_threads ... ok
+test page_rounded_capacity_is_fully_initialized ... ok
+test stopped_metrics_cover_the_rounded_image_and_owner_boundary ... ok
+test wrong_arena_tokens_cannot_read_restore_or_discard ... ok
+test stopped_image_is_exact ... ok
+test restore_replays_identical_inputs_to_identical_full_state ... ok
+test discard_invalidates_tokens_and_reuse_overwrites_every_slot ... ok
+test restore_is_exact ... ok
+test thousand_stopped_epochs_reject_old_tokens_and_replace_every_slot ... ok
+
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.23s
+
+exit=0
+
+$ cargo run --bin epochsnap -- doctor
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.01s
+     Running `target/debug/epochsnap doctor`
+userspace-only synchronous WP available
+page_size=4096 features=0x1ffff ioctls=0x8000000000000003 range_ioctls=0x17c
+Registration checked; actual fault validation requires linux_uffd tests.
+exit=0
+
+$ cargo test --test linux_uffd -- --ignored
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.01s
+     Running tests/linux_uffd.rs (target/debug/deps/linux_uffd-dfad715fb0c8cc77)
+
+running 39 tests
+test arena_worker_error_poisons_the_faulted_owner_before_release ... ok
+test close_releases_faulted_writer ... ok
+test delayed_real_fault_never_recopies_a_scanned_page ... ok
+test lifecycle::cancellation_returns_only_after_close_and_join ... ok
+test arena_worker_panic_poisons_the_faulted_owner_before_release ... ok
+test arming_acknowledgement_precedes_owner_resume ... ok
+test completed_wp_reuses_storage_and_restores_the_same_mapping ... ok
+test lifecycle::cancellation_cleanup_error_poisons_and_releases_queued_writer ... ok
+test lifecycle::failed_load_checks_health_after_payload_access ... ok
+test first_write_before_scan_has_fault_priority ... ok
+test lifecycle::final_unprotect_error_never_publishes_ready ... ok
+test lifecycle::owner_unwind_drops_pending_capture_before_unmapping ... ok
+test lifecycle::page_unprotect_error_poisons_before_releasing_owner ... ok
+test lifecycle::permanent_read_error_poisons_and_releases_queued_owner ... ok
+test lifecycle::partial_arm_failure_releases_all_resources_and_never_mutates_after_poison ... ok
+test lifecycle::out_of_range_read_reports_protocol_error_before_page_indexing ... ok
+test lifecycle::preflight_panic_retains_usable_arena_and_releases_resources ... ok
+test lifecycle::publication_error_after_close_never_publishes_ready ... ok
+test lifecycle::queued_cancellation_and_drop_abandon_no_resources ... ok
+test lifecycle::transient_read_and_wp_errors_retry_real_operations ... ok
+test lifecycle::worker_panic_with_blocked_owner_abandons_no_resources ... ok
+test one_page_preserves_prewrite ... ok
+test lifecycle::partial_page_copy_failure_never_publishes_ready ... ok
+test panic_publishes_failure_before_release ... ok
+test lifecycle::malformed_and_out_of_range_events_poison_with_a_real_queued_fault ... ok
+test partial_arm_failure_rolls_back_without_publishing_an_epoch ... ok
+test pending_arena_drop_joins_worker_before_mapping_retirement ... ok
+test pending_discard_releases_a_queued_fault ... ok
+test pending_discard_cancels_and_reuses_the_prepared_buffer ... ok
+test pending_drop_releases_a_queued_fault ... ok
+test error_publishes_failure_before_release ... ok
+test preflight_failure_retains_storage_and_usability ... ok
+test readiness_waits_for_context_close_and_worker_join ... ok
+test scan_before_write_allows_progress_and_rejects_pending_operations ... ok
+test wp_capture_overwrites_a_stale_prepared_image ... ok
+test wp_image_matches_stopped_oracle ... ok
+test lifecycle::final_descriptor_close_failure_aborts ... ok
+test lifecycle::escaped_worker_panic_aborts_instead_of_detaching ... ok
+test lifecycle::thousand_wp_epochs_isolate_cancelled_faults_tokens_and_images ... ok
+
+test result: ok. 39 passed; 0 failed; 0 ignored; 0 measured; 12 filtered out; finished in 0.52s
+
+exit=0
+
+$ cargo test --release --test linux_uffd -- --ignored
+    Finished `release` profile [optimized] target(s) in 0.01s
+     Running tests/linux_uffd.rs (target/release/deps/linux_uffd-0890e26583e319da)
+
+running 39 tests
+test arena_worker_error_poisons_the_faulted_owner_before_release ... ok
+test arena_worker_panic_poisons_the_faulted_owner_before_release ... ok
+test first_write_before_scan_has_fault_priority ... ok
+test arming_acknowledgement_precedes_owner_resume ... ok
+test close_releases_faulted_writer ... ok
+test lifecycle::cancellation_cleanup_error_poisons_and_releases_queued_writer ... ok
+test delayed_real_fault_never_recopies_a_scanned_page ... ok
+test lifecycle::failed_load_checks_health_after_payload_access ... ok
+test lifecycle::cancellation_returns_only_after_close_and_join ... ok
+test completed_wp_reuses_storage_and_restores_the_same_mapping ... ok
+test lifecycle::out_of_range_read_reports_protocol_error_before_page_indexing ... ok
+test lifecycle::final_unprotect_error_never_publishes_ready ... ok
+test lifecycle::page_unprotect_error_poisons_before_releasing_owner ... ok
+test lifecycle::partial_arm_failure_releases_all_resources_and_never_mutates_after_poison ... ok
+test lifecycle::permanent_read_error_poisons_and_releases_queued_owner ... ok
+test lifecycle::owner_unwind_drops_pending_capture_before_unmapping ... ok
+test lifecycle::transient_read_and_wp_errors_retry_real_operations ... ok
+test lifecycle::queued_cancellation_and_drop_abandon_no_resources ... ok
+test lifecycle::preflight_panic_retains_usable_arena_and_releases_resources ... ok
+test lifecycle::worker_panic_with_blocked_owner_abandons_no_resources ... ok
+test one_page_preserves_prewrite ... ok
+test lifecycle::publication_error_after_close_never_publishes_ready ... ok
+test lifecycle::malformed_and_out_of_range_events_poison_with_a_real_queued_fault ... ok
+test partial_arm_failure_rolls_back_without_publishing_an_epoch ... ok
+test panic_publishes_failure_before_release ... ok
+test lifecycle::partial_page_copy_failure_never_publishes_ready ... ok
+test pending_discard_cancels_and_reuses_the_prepared_buffer ... ok
+test error_publishes_failure_before_release ... ok
+test pending_drop_releases_a_queued_fault ... ok
+test pending_arena_drop_joins_worker_before_mapping_retirement ... ok
+test preflight_failure_retains_storage_and_usability ... ok
+test readiness_waits_for_context_close_and_worker_join ... ok
+test pending_discard_releases_a_queued_fault ... ok
+test wp_image_matches_stopped_oracle ... ok
+test scan_before_write_allows_progress_and_rejects_pending_operations ... ok
+test wp_capture_overwrites_a_stale_prepared_image ... ok
+test lifecycle::final_descriptor_close_failure_aborts ... ok
+test lifecycle::escaped_worker_panic_aborts_instead_of_detaching ... ok
+test lifecycle::thousand_wp_epochs_isolate_cancelled_faults_tokens_and_images ... ok
+
+test result: ok. 39 passed; 0 failed; 0 ignored; 0 measured; 12 filtered out; finished in 0.32s
+
+exit=0
+
+$ cargo test --all-targets
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.01s
+     Running unittests src/lib.rs (target/debug/deps/epochsnap-9da7c3eb62b5d462)
+
+running 12 tests
+test arena::tests::arena_identity_never_wraps_or_reuses_an_id ... ok
+test arena::tests::generation_exhaustion_does_not_publish_an_image_or_wrap ... ok
+test arena::tests::image_capacity_failure_is_reported_without_panicking ... ok
+test linux::tests::linux_66_uapi_layout_and_requests ... ok
+test linux::tests::missing_features_and_ioctl_support_are_errors ... ok
+test linux::tests::packed_fault_decodes_and_rejects_unexpected_flags ... ok
+test linux::tests::retries_interrupted_calls_and_only_requested_eagain ... ok
+test linux::tests::terminal_failure_is_visible_before_release ... ok
+test linux::tests::syscall_error_preserves_operation_and_errno ... ok
+test mapping::tests::rejects_invalid_allocation_sizes ... ok
+test arena::tests::restore_preserves_mapping_and_reuses_prepared_storage ... ok
+test mapping::tests::initialized_rounded_mapping_and_atomic_page_copy ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/bin/epochsnap.rs (target/debug/deps/epochsnap-defc5740ceff5a94)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/baseline.rs (target/debug/deps/baseline-0c3f1002a7aa6bb1)
+
+running 13 tests
+test rejects_zero_overflow_and_sizes_above_pointer_limit ... ok
+test last_slot_is_writable_and_invalid_offsets_do_not_mutate ... ok
+test ownership_and_retained_epoch_can_move_between_threads ... ok
+test dropped_arena_token_is_invalid_for_a_new_arena ... ok
+test second_capture_is_busy_and_preserves_the_retained_image ... ok
+test stopped_metrics_cover_the_rounded_image_and_owner_boundary ... ok
+test page_rounded_capacity_is_fully_initialized ... ok
+test stopped_image_is_exact ... ok
+test wrong_arena_tokens_cannot_read_restore_or_discard ... ok
+test restore_is_exact ... ok
+test discard_invalidates_tokens_and_reuse_overwrites_every_slot ... ok
+test restore_replays_identical_inputs_to_identical_full_state ... ok
+test thousand_stopped_epochs_reject_old_tokens_and_replace_every_slot ... ok
+
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.27s
+
+     Running tests/doctor.rs (target/debug/deps/doctor-6f38e419aec2168f)
+
+running 2 tests
+test doctor_exits_nonzero_when_userfaultfd_is_denied ... ok
+test denied_wp_capture_does_not_fallback_or_poison ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/examples.rs (target/debug/deps/examples-69c02841e5a54004)
+
+running 6 tests
+test wp_examples_replay_and_record_worker_costs ... ignored, requires actual userfaultfd WP; failure is not a skip
+test external_deadline_terminates_the_entire_example_process_tree ... ok
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.01s
+test stopped_demo_rewinds_and_compares_every_slot ... ok
+test examples_fail_usefully_when_wp_is_denied_without_substituting_stopped ... ok
+test benchmark_rejects_invalid_cli_before_creating_output ... ok
+test small_benchmark_records_comparable_trials_and_real_costs_without_uffd ... ok
+
+test result: ok. 5 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.30s
+
+     Running tests/linux_uffd.rs (target/debug/deps/linux_uffd-dfad715fb0c8cc77)
+
+running 51 tests
+test arena_worker_error_poisons_the_faulted_owner_before_release ... ignored, requires real userfaultfd WP; run explicitly
+test arena_worker_panic_poisons_the_faulted_owner_before_release ... ignored, requires real userfaultfd WP; run explicitly
+test arming_acknowledgement_precedes_owner_resume ... ignored, requires real userfaultfd WP; run explicitly
+test close_releases_faulted_writer ... ignored, requires real userfaultfd WP; run explicitly
+test completed_wp_reuses_storage_and_restores_the_same_mapping ... ignored, requires real userfaultfd WP; run explicitly
+test delayed_real_fault_never_recopies_a_scanned_page ... ignored, requires real userfaultfd WP; run explicitly
+test error_publishes_failure_before_release ... ignored, requires real userfaultfd WP; run explicitly
+test first_write_before_scan_has_fault_priority ... ignored, requires real userfaultfd WP; run explicitly
+test arena::tests::arena_identity_never_wraps_or_reuses_an_id ... ok
+test lifecycle::cancellation_cleanup_error_poisons_and_releases_queued_writer ... ignored, requires real userfaultfd WP; run explicitly
+test arena::tests::image_capacity_failure_is_reported_without_panicking ... ok
+test lifecycle::cancellation_returns_only_after_close_and_join ... ignored, requires real userfaultfd WP; run explicitly
+test lifecycle::escaped_worker_panic_aborts_instead_of_detaching ... ignored, requires real userfaultfd WP; run explicitly
+test lifecycle::failed_load_checks_health_after_payload_access ... ignored, requires real userfaultfd WP; run explicitly
+test arena::tests::generation_exhaustion_does_not_publish_an_image_or_wrap ... ok
+test lifecycle::final_descriptor_close_failure_aborts ... ignored, requires real userfaultfd WP; run explicitly
+test lifecycle::final_unprotect_error_never_publishes_ready ... ignored, requires real userfaultfd WP; run explicitly
+test lifecycle::malformed_and_out_of_range_events_poison_with_a_real_queued_fault ... ignored, requires real userfaultfd WP; run explicitly
+test lifecycle::out_of_range_read_reports_protocol_error_before_page_indexing ... ignored, requires real userfaultfd WP; run explicitly
+test lifecycle::owner_unwind_drops_pending_capture_before_unmapping ... ignored, requires real userfaultfd WP; run explicitly
+test lifecycle::page_unprotect_error_poisons_before_releasing_owner ... ignored, requires real userfaultfd WP; run explicitly
+test lifecycle::partial_arm_failure_releases_all_resources_and_never_mutates_after_poison ... ignored, requires real userfaultfd WP; run explicitly
+test lifecycle::partial_page_copy_failure_never_publishes_ready ... ignored, requires real userfaultfd WP; run explicitly
+test lifecycle::permanent_read_error_poisons_and_releases_queued_owner ... ignored, requires real userfaultfd WP; run explicitly
+test lifecycle::preflight_panic_retains_usable_arena_and_releases_resources ... ignored, requires real userfaultfd WP; run explicitly
+test lifecycle::publication_error_after_close_never_publishes_ready ... ignored, requires real userfaultfd WP; run explicitly
+test lifecycle::queued_cancellation_and_drop_abandon_no_resources ... ignored, requires real userfaultfd WP; run explicitly
+test lifecycle::thousand_wp_epochs_isolate_cancelled_faults_tokens_and_images ... ignored, requires real userfaultfd WP; run explicitly
+test lifecycle::transient_read_and_wp_errors_retry_real_operations ... ignored, requires real userfaultfd WP; run explicitly
+test lifecycle::worker_panic_with_blocked_owner_abandons_no_resources ... ignored, requires real userfaultfd WP; run explicitly
+test arena::tests::restore_preserves_mapping_and_reuses_prepared_storage ... ok
+test linux::tests::linux_66_uapi_layout_and_requests ... ok
+test linux::tests::missing_features_and_ioctl_support_are_errors ... ok
+test linux::tests::packed_fault_decodes_and_rejects_unexpected_flags ... ok
+test linux::tests::retries_interrupted_calls_and_only_requested_eagain ... ok
+test linux::tests::syscall_error_preserves_operation_and_errno ... ok
+test linux::tests::terminal_failure_is_visible_before_release ... ok
+test mapping::tests::rejects_invalid_allocation_sizes ... ok
+test one_page_preserves_prewrite ... ignored, requires real userfaultfd WP; run explicitly
+test mapping::tests::initialized_rounded_mapping_and_atomic_page_copy ... ok
+test panic_publishes_failure_before_release ... ignored, requires real userfaultfd WP; run explicitly
+test partial_arm_failure_rolls_back_without_publishing_an_epoch ... ignored, requires real userfaultfd WP; run explicitly
+test pending_arena_drop_joins_worker_before_mapping_retirement ... ignored, requires real userfaultfd WP; run explicitly
+test pending_discard_cancels_and_reuses_the_prepared_buffer ... ignored, requires real userfaultfd WP; run explicitly
+test pending_discard_releases_a_queued_fault ... ignored, requires real userfaultfd WP; run explicitly
+test pending_drop_releases_a_queued_fault ... ignored, requires real userfaultfd WP; run explicitly
+test preflight_failure_retains_storage_and_usability ... ignored, requires real userfaultfd WP; run explicitly
+test readiness_waits_for_context_close_and_worker_join ... ignored, requires real userfaultfd WP; run explicitly
+test scan_before_write_allows_progress_and_rejects_pending_operations ... ignored, requires real userfaultfd WP; run explicitly
+test wp_capture_overwrites_a_stale_prepared_image ... ignored, requires real userfaultfd WP; run explicitly
+test wp_image_matches_stopped_oracle ... ignored, requires real userfaultfd WP; run explicitly
+
+test result: ok. 12 passed; 0 failed; 39 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests examples/bench.rs (target/debug/examples/bench-6852547147004ac3)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests examples/rewind.rs (target/debug/examples/rewind-418aa1e5ab065592)
+
+running 1 test
+test tests::comparison_rejects_a_single_changed_slot_even_outside_records ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+exit=0
+
+$ cargo test
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.01s
+     Running unittests src/lib.rs (target/debug/deps/epochsnap-9da7c3eb62b5d462)
+
+running 12 tests
+test arena::tests::arena_identity_never_wraps_or_reuses_an_id ... ok
+test linux::tests::linux_66_uapi_layout_and_requests ... ok
+test arena::tests::generation_exhaustion_does_not_publish_an_image_or_wrap ... ok
+test arena::tests::image_capacity_failure_is_reported_without_panicking ... ok
+test linux::tests::retries_interrupted_calls_and_only_requested_eagain ... ok
+test linux::tests::packed_fault_decodes_and_rejects_unexpected_flags ... ok
+test linux::tests::syscall_error_preserves_operation_and_errno ... ok
+test mapping::tests::rejects_invalid_allocation_sizes ... ok
+test mapping::tests::initialized_rounded_mapping_and_atomic_page_copy ... ok
+test arena::tests::restore_preserves_mapping_and_reuses_prepared_storage ... ok
+test linux::tests::terminal_failure_is_visible_before_release ... ok
+test linux::tests::missing_features_and_ioctl_support_are_errors ... ok
+
+test result: ok. 12 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running unittests src/bin/epochsnap.rs (target/debug/deps/epochsnap-defc5740ceff5a94)
+
+running 0 tests
+
+test result: ok. 0 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+     Running tests/baseline.rs (target/debug/deps/baseline-0c3f1002a7aa6bb1)
+
+running 13 tests
+test rejects_zero_overflow_and_sizes_above_pointer_limit ... ok
+test last_slot_is_writable_and_invalid_offsets_do_not_mutate ... ok
+test dropped_arena_token_is_invalid_for_a_new_arena ... ok
+test stopped_metrics_cover_the_rounded_image_and_owner_boundary ... ok
+test wrong_arena_tokens_cannot_read_restore_or_discard ... ok
+test second_capture_is_busy_and_preserves_the_retained_image ... ok
+test discard_invalidates_tokens_and_reuse_overwrites_every_slot ... ok
+test ownership_and_retained_epoch_can_move_between_threads ... ok
+test page_rounded_capacity_is_fully_initialized ... ok
+test restore_replays_identical_inputs_to_identical_full_state ... ok
+test restore_is_exact ... ok
+test stopped_image_is_exact ... ok
+test thousand_stopped_epochs_reject_old_tokens_and_replace_every_slot ... ok
+
+test result: ok. 13 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.25s
+
+     Running tests/doctor.rs (target/debug/deps/doctor-6f38e419aec2168f)
+
+running 2 tests
+test doctor_exits_nonzero_when_userfaultfd_is_denied ... ok
+test denied_wp_capture_does_not_fallback_or_poison ... ok
+
+test result: ok. 2 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.01s
+
+     Running tests/examples.rs (target/debug/deps/examples-69c02841e5a54004)
+
+running 6 tests
+test wp_examples_replay_and_record_worker_costs ... ignored, requires actual userfaultfd WP; failure is not a skip
+test external_deadline_terminates_the_entire_example_process_tree ... ok
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.01s
+test examples_fail_usefully_when_wp_is_denied_without_substituting_stopped ... ok
+test stopped_demo_rewinds_and_compares_every_slot ... ok
+test benchmark_rejects_invalid_cli_before_creating_output ... ok
+test small_benchmark_records_comparable_trials_and_real_costs_without_uffd ... ok
+
+test result: ok. 5 passed; 0 failed; 1 ignored; 0 measured; 0 filtered out; finished in 0.38s
+
+     Running tests/linux_uffd.rs (target/debug/deps/linux_uffd-dfad715fb0c8cc77)
+
+running 51 tests
+test arena::tests::arena_identity_never_wraps_or_reuses_an_id ... ok
+test arena_worker_error_poisons_the_faulted_owner_before_release ... ignored, requires real userfaultfd WP; run explicitly
+test arena_worker_panic_poisons_the_faulted_owner_before_release ... ignored, requires real userfaultfd WP; run explicitly
+test arming_acknowledgement_precedes_owner_resume ... ignored, requires real userfaultfd WP; run explicitly
+test close_releases_faulted_writer ... ignored, requires real userfaultfd WP; run explicitly
+test completed_wp_reuses_storage_and_restores_the_same_mapping ... ignored, requires real userfaultfd WP; run explicitly
+test delayed_real_fault_never_recopies_a_scanned_page ... ignored, requires real userfaultfd WP; run explicitly
+test error_publishes_failure_before_release ... ignored, requires real userfaultfd WP; run explicitly
+test first_write_before_scan_has_fault_priority ... ignored, requires real userfaultfd WP; run explicitly
+test arena::tests::image_capacity_failure_is_reported_without_panicking ... ok
+test lifecycle::cancellation_cleanup_error_poisons_and_releases_queued_writer ... ignored, requires real userfaultfd WP; run explicitly
+test lifecycle::cancellation_returns_only_after_close_and_join ... ignored, requires real userfaultfd WP; run explicitly
+test lifecycle::escaped_worker_panic_aborts_instead_of_detaching ... ignored, requires real userfaultfd WP; run explicitly
+test lifecycle::failed_load_checks_health_after_payload_access ... ignored, requires real userfaultfd WP; run explicitly
+test lifecycle::final_descriptor_close_failure_aborts ... ignored, requires real userfaultfd WP; run explicitly
+test arena::tests::generation_exhaustion_does_not_publish_an_image_or_wrap ... ok
+test lifecycle::final_unprotect_error_never_publishes_ready ... ignored, requires real userfaultfd WP; run explicitly
+test lifecycle::malformed_and_out_of_range_events_poison_with_a_real_queued_fault ... ignored, requires real userfaultfd WP; run explicitly
+test lifecycle::out_of_range_read_reports_protocol_error_before_page_indexing ... ignored, requires real userfaultfd WP; run explicitly
+test lifecycle::owner_unwind_drops_pending_capture_before_unmapping ... ignored, requires real userfaultfd WP; run explicitly
+test lifecycle::page_unprotect_error_poisons_before_releasing_owner ... ignored, requires real userfaultfd WP; run explicitly
+test lifecycle::partial_arm_failure_releases_all_resources_and_never_mutates_after_poison ... ignored, requires real userfaultfd WP; run explicitly
+test lifecycle::partial_page_copy_failure_never_publishes_ready ... ignored, requires real userfaultfd WP; run explicitly
+test lifecycle::permanent_read_error_poisons_and_releases_queued_owner ... ignored, requires real userfaultfd WP; run explicitly
+test lifecycle::preflight_panic_retains_usable_arena_and_releases_resources ... ignored, requires real userfaultfd WP; run explicitly
+test lifecycle::publication_error_after_close_never_publishes_ready ... ignored, requires real userfaultfd WP; run explicitly
+test lifecycle::queued_cancellation_and_drop_abandon_no_resources ... ignored, requires real userfaultfd WP; run explicitly
+test lifecycle::thousand_wp_epochs_isolate_cancelled_faults_tokens_and_images ... ignored, requires real userfaultfd WP; run explicitly
+test lifecycle::transient_read_and_wp_errors_retry_real_operations ... ignored, requires real userfaultfd WP; run explicitly
+test lifecycle::worker_panic_with_blocked_owner_abandons_no_resources ... ignored, requires real userfaultfd WP; run explicitly
+test linux::tests::linux_66_uapi_layout_and_requests ... ok
+test arena::tests::restore_preserves_mapping_and_reuses_prepared_storage ... ok
+test linux::tests::missing_features_and_ioctl_support_are_errors ... ok
+test linux::tests::packed_fault_decodes_and_rejects_unexpected_flags ... ok
+test linux::tests::retries_interrupted_calls_and_only_requested_eagain ... ok
+test linux::tests::syscall_error_preserves_operation_and_errno ... ok
+test linux::tests::terminal_failure_is_visible_before_release ... ok
+test one_page_preserves_prewrite ... ignored, requires real userfaultfd WP; run explicitly
+test mapping::tests::rejects_invalid_allocation_sizes ... ok
+test mapping::tests::initialized_rounded_mapping_and_atomic_page_copy ... ok
+test panic_publishes_failure_before_release ... ignored, requires real userfaultfd WP; run explicitly
+test partial_arm_failure_rolls_back_without_publishing_an_epoch ... ignored, requires real userfaultfd WP; run explicitly
+test pending_arena_drop_joins_worker_before_mapping_retirement ... ignored, requires real userfaultfd WP; run explicitly
+test pending_discard_cancels_and_reuses_the_prepared_buffer ... ignored, requires real userfaultfd WP; run explicitly
+test pending_discard_releases_a_queued_fault ... ignored, requires real userfaultfd WP; run explicitly
+test pending_drop_releases_a_queued_fault ... ignored, requires real userfaultfd WP; run explicitly
+test preflight_failure_retains_storage_and_usability ... ignored, requires real userfaultfd WP; run explicitly
+test readiness_waits_for_context_close_and_worker_join ... ignored, requires real userfaultfd WP; run explicitly
+test scan_before_write_allows_progress_and_rejects_pending_operations ... ignored, requires real userfaultfd WP; run explicitly
+test wp_capture_overwrites_a_stale_prepared_image ... ignored, requires real userfaultfd WP; run explicitly
+test wp_image_matches_stopped_oracle ... ignored, requires real userfaultfd WP; run explicitly
+
+test result: ok. 12 passed; 0 failed; 39 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+   Doc-tests epochsnap
+
+running 1 test
+test src/arena.rs - arena::Arena (line 80) ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.00s
+
+
+running 5 tests
+test src/arena.rs - arena::Arena::checkpoint_words (line 306) - compile fail ... ok
+test src/arena.rs - arena::Arena::checkpoint_words (line 297) - compile fail ... ok
+test src/arena.rs - arena::Epoch (line 36) - compile fail ... ok
+test src/arena.rs - arena::Arena (line 98) - compile fail ... ok
+test src/arena.rs - arena::Arena (line 106) - compile fail ... ok
+
+test result: ok. 5 passed; 0 failed; 0 ignored; 0 measured; 0 filtered out; finished in 0.05s
+
+all doctests ran in 0.27s; merged doctests compilation took 0.21s
+exit=0
+
+$ cargo test --test examples -- --ignored
+    Finished `test` profile [unoptimized + debuginfo] target(s) in 0.01s
+     Running tests/examples.rs (target/debug/deps/examples-69c02841e5a54004)
+
+running 1 test
+    Finished `dev` profile [unoptimized + debuginfo] target(s) in 0.01s
+test wp_examples_replay_and_record_worker_costs ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 5 filtered out; finished in 0.21s
+
+exit=0
+
+$ cargo test --release --test examples -- --ignored
+   Compiling epochsnap v0.1.0 (.)
+    Finished `release` profile [optimized] target(s) in 0.81s
+     Running tests/examples.rs (target/release/deps/examples-88e210b7c91b0c6f)
+
+running 1 test
+    Finished `release` profile [optimized] target(s) in 0.01s
+test wp_examples_replay_and_record_worker_costs ... ok
+
+test result: ok. 1 passed; 0 failed; 0 ignored; 0 measured; 5 filtered out; finished in 0.07s
+
+exit=0

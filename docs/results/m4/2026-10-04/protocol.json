@@ -1,0 +1,49 @@
+{
+  "seed": 1,
+  "shuffle_seed": 20261004,
+  "trials_per_mode_case": 10,
+  "idle_sizes_mib": [
+    16,
+    64,
+    256
+  ],
+  "idle_workloads": [
+    "read-heavy",
+    "sparse",
+    "clustered",
+    "sequential"
+  ],
+  "idle_placement": "inherited affinity; no intentional competing load; desktop services remain",
+  "contention_sizes_mib": [
+    64
+  ],
+  "contention_workloads": [
+    "sparse",
+    "sequential"
+  ],
+  "pinned_idle_control": "same two-CPU affinity as contention, without yes processes",
+  "contention_affinity": [
+    2,
+    8
+  ],
+  "contention_load": "one continuously writing 'yes' process per selected CPU, stdout /dev/null",
+  "optional_1gib": "not run; optional larger-memory experiment",
+  "csv_files": [
+    "idle-16-read-heavy.csv",
+    "idle-16-sparse.csv",
+    "idle-16-clustered.csv",
+    "idle-16-sequential.csv",
+    "idle-64-read-heavy.csv",
+    "idle-64-sparse.csv",
+    "idle-64-clustered.csv",
+    "idle-64-sequential.csv",
+    "idle-256-read-heavy.csv",
+    "idle-256-sparse.csv",
+    "idle-256-clustered.csv",
+    "idle-256-sequential.csv",
+    "pinned-idle-64-sparse.csv",
+    "pinned-idle-64-sequential.csv",
+    "contention-64-sparse.csv",
+    "contention-64-sequential.csv"
+  ]
+}

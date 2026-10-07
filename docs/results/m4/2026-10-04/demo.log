@@ -1,0 +1,17 @@
+    Finished `release` profile [optimized] target(s) in 0.01s
+     Running `target/release/examples/rewind`
+same-process, in-memory rewind; mode=WriteProtected, arena=16777216 bytes, base pages=4096 bytes
+logical step, RNG, accumulator and fixed records live in slots; rendering and external effects do not rewind
+checkpoint step=128; owner resumed after the capture boundary
+capture pending: 382/4096 pages; live step=256
+capture pending: 685/4096 pages; live step=384
+capture pending: 996/4096 pages; live step=512
+capture pending: 1311/4096 pages; live step=640
+capture pending: 1574/4096 pages; live step=768
+capture pending: 1842/4096 pages; live step=896
+capture pending: 2042/4096 pages; live step=1024
+capture pending: 2233/4096 pages; live step=1152
+capture ready after final close and worker join; checkpoint step=128
+advanced to step=1408, state hash=21347a96d40238a4
+restored step=128; replaying identical inputs
+full-state equality: true (2097152 slots); replay hash=21347a96d40238a4

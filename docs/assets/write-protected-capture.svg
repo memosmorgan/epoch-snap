@@ -1,0 +1,68 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="960" height="320" viewBox="0 0 960 320" role="img" aria-labelledby="title description">
+  <title id="title">EpochSnap WriteProtected capture</title>
+  <desc id="description">The application owner checkpoints an atomic arena. The capture worker write-protects the entire arena before the owner resumes, then scans pages. A write to an unsaved page faults; the worker saves the whole page into the checkpoint image before removing write protection and unblocking the writer.</desc>
+  <style>
+    :root { --bg: #f6f8fa; --box: #ffffff; --text: #1f2328; --muted: #57606a; --border: #d0d7de; --accent: #0969da; }
+    @media (prefers-color-scheme: dark) {
+      :root { --bg: #161b22; --box: #0d1117; --text: #e6edf3; --muted: #9da7b1; --border: #48515b; --accent: #79c0ff; }
+    }
+    text { font-family: ui-sans-serif, system-ui, -apple-system, "Segoe UI", sans-serif; fill: var(--text); }
+    .lane { fill: var(--bg); stroke: var(--border); }
+    .box { fill: var(--box); stroke: var(--border); }
+    .label { font-size: 12px; font-weight: 600; letter-spacing: 1px; fill: var(--muted); }
+    .name { font-size: 16px; font-weight: 600; text-anchor: middle; }
+    .note { font-size: 12px; fill: var(--muted); text-anchor: middle; }
+    .edge-label { font-size: 13px; fill: var(--muted); }
+    .flow { fill: none; stroke: var(--muted); stroke-width: 1.6; marker-end: url(#arrow); }
+    .fault { fill: none; stroke: var(--accent); stroke-width: 1.8; marker-end: url(#fault-arrow); }
+    .resume { stroke-dasharray: 4 4; }
+  </style>
+  <defs>
+    <marker id="arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M0 0 8 4 0 8Z" fill="var(--muted)"/>
+    </marker>
+    <marker id="fault-arrow" viewBox="0 0 8 8" refX="7" refY="4" markerWidth="6" markerHeight="6" orient="auto-start-reverse">
+      <path d="M0 0 8 4 0 8Z" fill="var(--accent)"/>
+    </marker>
+  </defs>
+
+  <rect class="lane" x="12" y="8" width="936" height="146" rx="6"/>
+  <rect class="lane" x="12" y="170" width="936" height="138" rx="6"/>
+  <text class="label" x="28" y="34">APPLICATION THREAD</text>
+  <text class="label" x="28" y="198">CAPTURE WORKER</text>
+
+  <rect class="box" x="28" y="60" width="120" height="52" rx="4"/>
+  <text class="name" x="88" y="82">App owner</text>
+  <text class="note" x="88" y="101">operation boundary</text>
+  <rect class="box" x="212" y="60" width="144" height="52" rx="4"/>
+  <text class="name" x="284" y="82">Atomic arena</text>
+  <text class="note" x="284" y="101">live mapping</text>
+  <rect class="box" x="542" y="60" width="178" height="52" rx="4"/>
+  <text class="name" x="631" y="91">Write unsaved page</text>
+  <rect class="box" x="778" y="60" width="148" height="52" rx="4"/>
+  <text class="name" x="852" y="82">Unblock writer</text>
+  <text class="note" x="852" y="101">page becomes writable</text>
+
+  <rect class="box" x="212" y="220" width="160" height="52" rx="4"/>
+  <text class="name" x="292" y="242">Write-protect pages</text>
+  <text class="note" x="292" y="261">entire arena</text>
+  <rect class="box" x="424" y="220" width="210" height="52" rx="4"/>
+  <text class="name" x="529" y="242">Background capture</text>
+  <text class="note" x="529" y="261">scan + fault service</text>
+  <rect class="box" x="716" y="220" width="210" height="52" rx="4"/>
+  <text class="name" x="821" y="242">Save whole page</text>
+  <text class="note" x="821" y="261">checkpoint image</text>
+
+  <path class="flow" d="M148 86H212"/>
+  <path class="flow" d="M284 112V220"/>
+  <text class="edge-label" x="296" y="181">checkpoint</text>
+  <path class="flow" d="M372 246H424"/>
+  <path class="flow" d="M634 246H716"/>
+  <text class="edge-label" x="656" y="236">scan</text>
+  <path class="flow resume" d="M356 220V132H568V112"/>
+  <text class="edge-label" x="383" y="146">after full arming</text>
+  <path class="fault" d="M650 112V204H766V220"/>
+  <text class="edge-label" x="670" y="181" style="fill:var(--accent)">write fault</text>
+  <path class="flow" d="M900 220V112"/>
+  <text class="edge-label" x="884" y="181" text-anchor="end">remove WP</text>
+</svg>

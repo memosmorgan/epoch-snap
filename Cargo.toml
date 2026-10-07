@@ -1,0 +1,10 @@
+[package]
+name = "epochsnap"
+version = "0.1.0"
+edition = "2024"
+publish = false
+description = "Cooperative atomic-arena checkpoints and same-process RAM rewind"
+license = "MIT"
+
+[dependencies]
+libc = "0.2"

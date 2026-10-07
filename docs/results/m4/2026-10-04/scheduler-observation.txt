@@ -1,0 +1,5 @@
+    PID     TID CLS  NI PSR COMMAND
+  73742   73742  TS   0   8 bench
+Observer scheduler=0 (SCHED_OTHER=0), nice=0, inherited affinity=[0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11]
+scaling_governor=powersave
+scaling_driver=amd-pstate-epp
